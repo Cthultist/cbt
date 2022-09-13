@@ -10,6 +10,7 @@ class ComicFile():
 
         self.pages = []
         self.current_page = None
+        #TODO: determine how to iterate through files in folders
         if self.file_type_check(container_file) == 'zip':
             
             container_file = ZipFile(container_file)
