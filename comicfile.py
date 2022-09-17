@@ -2,32 +2,49 @@ from zipfile import ZipFile
 from PIL import Image
 from io import BytesIO
 import filetype
-import rarfile
+from rarfile import RarFile
 
 class ComicFile():
 
     def __init__(self, container_file):
-
+        
         self.pages = []
         self.current_page = None
         #TODO: determine how to iterate through files in folders
         if self.file_type_check(container_file) == 'zip':
             
-            container_file = ZipFile(container_file)
+            # container_file = ZipFile(container_file)
 
-            for file in container_file.infolist():
-                print(file.filename)
-                self.pages.append(Image.open(BytesIO(container_file.read(file.filename)))) # is there a better way of doing this
+            with ZipFile(container_file, "r") as zip_data:
+                for items in zip_data.infolist():
+                    if items.is_dir():
+                        for files in zip_data.open(items):
+                            print(f"files in folder: {files}")
+                            self.pages.append(Image.open(BytesIO.read((files.filename()))))
+                    else:
+                        self.pages.append(Image.open(BytesIO(zip_data.read(items.filename))))                      
+            zip_data.close()    
+            # for file in container_file.infolist():
+            #     print(file.filename)
+            #     self.pages.append(Image.open(BytesIO(container_file.read(file.filename)))) # is there a better way of doing this
 
             # print(self.pages)
         elif self.file_type_check(container_file) == 'rar':
         
-            container_file = rarfile.RarFile(container_file)
-
-            for file in container_file.infolist():
-                print(file.filename)
-                self.pages.append(Image.open(BytesIO(container_file.read(file.filename))))
-        
+            # rar_data = rarfile.RarFile(container_file)
+            with RarFile(container_file, "r") as rar_data:
+                for items in rar_data.infolist():
+                    if items.is_dir():
+                        for files in rar_data.open(items):
+                            print(f"files in folder: {files}")
+                            self.pages.append(Image.open(BytesIO.read((files.filename()))))
+                    else:
+                        self.pages.append(Image.open(BytesIO(rar_data.open(items.filename))))
+            rar_data.close()
+            # rar_data = rarfile.RarFile(container_file)
+            # for file in container_file.infolist():
+            #     print(file.filename)
+            #     self.pages.append(Image.open(BytesIO(container_file.read(file.filename))))
         self.current_page = 0
             
     def get_next_page(self):

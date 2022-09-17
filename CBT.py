@@ -38,6 +38,7 @@ b_box = Box(box, align="bottom", border=1,  height=45, width=177, layout="grid",
 b_box.bg = "#2B083B"
 b_box.text_color = "#005eff"
 picture = Picture(box, image="Baphomet.png")
+picture.resize(app.width, app.height)
 
 OF_button = PushButton(b_box, text="Open File", padx=5, pady=10, command=get_file, align="bottom", grid=[1,0])
 BACK_button = PushButton(b_box, text="Back", padx=5, pady=10, command=image_back, align="bottom", grid=[0,0])
